@@ -45,15 +45,12 @@ mkdir -p "${CSV_DATA_DIR}"
 # Profile load script
 echo "Building GFE data..."
 
-# Run load script
+# Initialize
 echo "" > summary_agg.txt
 echo "" > summary_diff.txt
 
-# Remove previously created csv files
-rm $CSV_DATA_DIR/*.csv
-
 # Build csv files
-python3 "${BIN_DIR}"/build_gfedb_stream.py \
+python3 "${BIN_DIR}"/build_gfedb.py \
 	-o "${CSV_DATA_DIR}" \
 	-r "${RELEASES}" \
 	${KIRFLAG} \
