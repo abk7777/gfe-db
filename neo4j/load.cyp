@@ -1,28 +1,46 @@
 // Nodes
 RETURN '(:GFE)' AS `Creating nodes...`;
-USING PERIODIC COMMIT 50000
-LOAD CSV WITH HEADERS FROM 'file:///gfe_sequences.RELEASE.csv' as row
-MERGE (gfe:GFE { gfe_name: row.gfe_name }) // static property
-ON CREATE SET gfe.locus = row.locus;
+CALL apoc.periodic.iterate(
+    '
+    USING PERIODIC COMMIT 50000
+    LOAD CSV WITH HEADERS FROM "file:///gfe_sequences.3420.csv" as row RETURN row
+    ','
+    MERGE (gfe:GFE { gfe_name: row.gfe_name }) 
+    ON CREATE SET gfe.locus = row.locus
+    ',
+    {batchSize:1000, parallel:true});
 
 RETURN '(:Sequence)' AS `Creating nodes...`;
-USING PERIODIC COMMIT 50000
-LOAD CSV WITH HEADERS FROM 'file:///gfe_sequences.RELEASE.csv' as row
-MERGE (seq:Sequence { gfe_name: row.gfe_name })
-ON CREATE SET seq.seq_id = row.seq_id,
-    seq.locus = row.locus,
-    seq.sequence = row.sequence,
-    seq.length = row.length;
+CALL apoc.periodic.iterate(
+    '
+    USING PERIODIC COMMIT 50000
+    LOAD CSV WITH HEADERS FROM "file:///gfe_sequences.3420.csv" as row RETURN row
+    ','
+    MERGE (seq:Sequence { gfe_name: row.gfe_name })
+    ON CREATE SET seq.seq_id = row.seq_id,
+        seq.locus = row.locus,
+        seq.sequence = row.sequence,
+        seq.length = row.length;
+    ',
+    {batchSize:1000, parallel:true});
 
 RETURN '(:Feature)' AS `Creating nodes...`;
-USING PERIODIC COMMIT 50000
-LOAD CSV WITH HEADERS FROM 'file:///all_features.RELEASE.csv' as row
-MERGE (f:Feature { 
-    locus: row.locus,
-    rank: row.rank,
-    term: row.term,
-    accession: row.accession
-    });
+CALL apoc.periodic.iterate(
+    '
+    USING PERIODIC COMMIT 50000
+    LOAD CSV WITH HEADERS FROM "file:///all_features.3420.csv" as row RETURN row
+    ','
+    MERGE (f:Feature { 
+        locus: row.locus,
+        rank: row.rank,
+        term: row.term,
+        accession: row.accession
+        })
+    ',
+    {batchSize:1000, parallel:true});
+
+
+////////////
 
 RETURN '(:GenomicAlignment)' AS `Creating nodes...`;
 USING PERIODIC COMMIT 50000 
